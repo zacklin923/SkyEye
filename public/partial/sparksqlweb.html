@@ -1,0 +1,141 @@
+<div class="container-fluid">
+  <div class="row-fluid">
+    <div class="span3">
+      <!--database & tables-->
+      <p>
+
+      <div>Hive Tables:</div>
+      <p>
+
+      <div id="tables" style="height: 400px; overflow: scroll;"></div>
+      <p>
+
+      <div id="selected_table" style="font-weight:bold; color: darkred">mvdw.report_olap</div>
+      <p>
+
+      <div>Partitions:</div>
+      <div id="partitions" style="height: 500px;"></div>
+      <p>
+
+      <!--<div>Table Schema:</div>-->
+      <!--<div id="columns" style="height: 400px;"></div>-->
+    </div>
+    <div class="span9" id="tabstrip">
+      <ul>
+        <li class="k-state-active">SQL Query</li>
+        <li>Sample</li>
+        <li>Schema</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    var ts = $("#tabstrip").kendoTabStrip({
+      animation: {open: {effects: "fadeIn"}},
+      contentUrls: [
+        '/assets/partial/sparksqlquery.html',
+        '/assets/partial/tablesamplerows.html',
+        '/assets/partial/tableschema.html',
+      ]
+    }).data('kendoTabStrip');
+
+//    ts.tabGroup.on('click','li',function(e){
+//      ts.reload($(this));
+//    })
+  });
+</script>
+
+<script>
+  var serviceRoot = "/rest/webhcat";
+
+  function onSelect(e) {
+
+    // table node, list partitions and show columns
+    if (this.parent(e.node)) {
+
+      var table = this.text(e.node);
+      var database = this.text(this.parent(e.node));
+
+      $("#selected_table").text(database + "." + table);
+
+      var partitions = $("#partitions").data("kendoGrid");
+      partitions.dataSource.transport.options.read.url = serviceRoot + "/partitions?database=" + database + "&table=" + table;
+      partitions.dataSource.read();
+
+      if($('#tableschema').length > 0){
+        console.log("refresh tableschema")
+        $("#tableschema").load("/assets/partial/tableschema.html")
+      }
+
+      if($('#tablesamplerows').length > 0){
+        console.log("refresh tablesamplerows")
+        $("#tablesamplerows").load("/assets/partial/tablesamplerows.html")
+      }
+
+    }
+
+  }
+
+  var tables = {
+    transport: {
+      read: {
+        url: serviceRoot + "/tables",
+        dataType: "json"
+      }
+    },
+    schema: {
+      model: {
+        id: "table",
+        hasChildren: false
+      }
+    }
+  };
+  var databases = new kendo.data.HierarchicalDataSource({
+    transport: {
+      read: {
+        url: serviceRoot + "/databases",
+        dataType: "json"
+      }
+    },
+    schema: {
+      model: {
+        id: "database",
+        hasChildren: true,
+        children: tables
+      }
+    }
+  });
+
+  $("#tables").kendoTreeView({
+    dataSource: databases,
+    dataTextField: ["database", "table", "partition"],
+    select: onSelect
+  });
+
+  var partitionsGrid = $("#partitions").kendoGrid({
+    dataSource: {
+      transport: {
+        read: serviceRoot + "/partitions?database=mvdw&table=report_olap",
+        dataType: "json"
+      },
+      error: function(e){
+        console.log("error when getting partition ");
+        $('#partitions').empty();
+      }
+    },
+    resizable: true,
+    columns: [
+      {
+        field: "partition",
+        title: "Partition Name",
+        width: 260
+      }
+    ]
+  });
+
+</script>
+
+
+</div>

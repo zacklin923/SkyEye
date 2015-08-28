@@ -1,0 +1,241 @@
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span1">
+            <div class="sidebar-nav">
+                <div class="navbar navbar-default" role="navigation">
+                    <ul class="nav navbar-nav">
+                      <li><a href="#/mrv2job/overview">Overview</a></li>
+                      <li><a href="#/mrv2job/today">Today</a></li>
+                      <li><a href="#/mrv2job/last2weeks">2Weeks</a></li>
+                      <li><a href="#/mrv2job/failed">Failed</a></li>
+                      <li><a href="#/mrv2job/longrunning">LongRunning</a></li>
+                      <li><a href="#/mrv2job/timeline">Timeline</a></li>
+                      <li><a href="#/mrv2job/jobinfo">JobInfo</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="span11">
+            <form class="form-inline">
+                <label for="jobname">Job Name : </label><input id="jobname" type="text" class="input-large" placeholder="support fuzzy query">
+                <label for="start">Start: </label><input id="start" style="width: 220px"/>
+                <label for="end">End: </label><input id="end" style="width: 220px"/>
+
+                <button class="submitButton k-button" id="submit">Submit</button>
+            </form>
+            <div id="jobinfo"></div>
+            <div id="window"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var wnd ;
+
+    $(document).ready(function () {
+
+        function startChange() {
+            var startDate = start.value(),
+                    endDate = end.value();
+        }
+
+        function endChange() {
+            var endDate = end.value(),
+                    startDate = start.value();
+        }
+
+        var today = kendo.date.today();
+
+        var now = new Date();
+        var day = now.getDate();
+        var month = now.getMonth();
+        var year = now.getFullYear();
+        var hour = now.getHours();
+
+        var yestory = new Date(year, month, day-1);
+
+        var start = $("#start").kendoDatePicker({
+            value: yestory,
+            change: startChange
+        }).data("kendoDatePicker");
+
+        var end = $("#end").kendoDatePicker({
+            value: today,
+            change: endChange
+        }).data("kendoDatePicker");
+
+        var date = $("#date").kendoDatePicker({
+            value: yestory,
+            change: endChange
+        }).data("kendoDatePicker");
+
+
+        $("#submit").click(refreshGrid);
+
+        var startDate = kendo.toString(start.value(), "yyyy-MM-dd");
+        var endDate = kendo.toString(end.value(), "yyyy-MM-dd");
+
+        function refreshGrid(e) {
+            startDate = kendo.toString(start.value(), "yyyy-MM-dd");
+            endDate = kendo.toString(end.value(), "yyyy-MM-dd");
+            var jobname = $("#jobname").val();
+
+            var grid = $("#jobinfo").data("kendoGrid");
+            grid.dataSource.transport.options.read.url = serviceRoot + "?start=" + startDate + "&end=" + endDate + "&jobname="+ jobname;
+            grid.dataSource.read();
+        }
+
+        var serviceRoot = "/rest/mrv2job/jobinfo";
+
+        $("#jobinfo").kendoGrid({
+            dataSource: {
+                transport: {
+                    read: serviceRoot
+                },
+//                sort: { field: "rundate", dir: "asc" },
+                pageSize: 20
+            },
+            height: 600,
+            detailInit: jobwatcher,
+//                dataBound: function() {
+//                    this.expandRow(this.tbody.find("tr.k-master-row").first());
+//                },
+            resizable: true,
+            groupable: true,
+            sortable: true,
+            pageable: {
+                refresh: true,
+                pageSizes: true,
+                buttonCount: 5
+            },
+            filterable: {
+                mode: "row"
+            },
+            columns: [
+                {
+                    field: "jobtype",
+                    title: "Job Type",
+                    width: 80
+                },
+                {
+                    field: "project",
+                    title: "Project",
+                    width: 100
+                },
+                {
+                    field: "jobshortname",
+                    title: "Job ShortName",
+                    width: 180
+                },
+                {
+                    field: "rundate",
+                    title: "rundate",
+                    width: 100
+                },
+                {
+                    field: "submit_host",
+                    title: "Submit Host",
+                    width: 80
+                },
+                {
+                    field: "inputdir",
+                    title: "INPUTDIR",
+                    width: 180
+                },
+                {
+                    field: "inputformat",
+                    title: "INPUTFORMAT"
+                },
+                {
+                    field: "outputdir",
+                    title: "OUTPUTDIR",
+                    width: 180
+                },
+                {
+                    field: "outputformat",
+                    title: "OUTPUTFORMAT"
+                },
+//                {
+//                    field: "out_compress",
+//                    title: "OUT_COMPRESS"
+//                },
+//                {
+//                    field: "out_compress_codec",
+//                    title: "OUT_COMPRESS_CODEC"
+//                },
+                {
+                    field: "map_memory",
+                    title: "MAP_MEMORY",
+                    width: 80
+                },
+                {
+                    field: "reduce_memory",
+                    title: "REDUCE_MEMORY",
+                    width: 80
+                },
+                {command: { text: "watch", click: watchJob }, title: "WATCH", width: "80px" }
+            ]
+        });
+
+      function jobwatcher(e) {
+
+        $("<div/>").appendTo(e.detailCell).kendoGrid({
+          dataSource: {
+            transport: {
+              read: "/rest/mrv2job/jobwatcher?jobname=" + e.data.jobshortname
+            }
+          },
+          height: 100,
+          columns: [
+            {
+              field: "jobName",
+              title: "jobName",
+              width: 300
+            },
+            {
+              field: "jobOwner",
+              title: "jobOwner",
+              width: 100
+            },
+            {
+              field: "jobOwnerPhone",
+              title: "jobOwnerPhone",
+              width: 180
+            },
+            {
+              field: "onCallName",
+              title: "onCallName",
+              width: 100
+            },
+            {
+              field: "onCallPhone",
+              title: "onCallPhone",
+              width: 180
+            }
+          ]
+        });
+      };
+
+
+      function watchJob(e) {
+        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
+
+        var jobname = dataItem.jobshortname
+
+        var window = $("#window").kendoWindow({
+          height: "550px",
+          width: "400px",
+          modal: true,
+          resizable: true,
+          draggable: true,
+          title: "Job Watcher",
+          content: "/mrv2job/watcherinfo?jobname="+jobname,
+          visible: false /*don't show it yet*/
+        }).data("kendoWindow").center().open();
+
+      }
+    });
+
+</script>
+
+</div>

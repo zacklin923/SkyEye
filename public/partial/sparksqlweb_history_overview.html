@@ -1,0 +1,117 @@
+<div class="container-fluid">
+    <div class="row-fluid">
+        <div class="span1">
+            <div class="sidebar-nav">
+                <div class="navbar navbar-default" role="navigation">
+                    <ul class="nav navbar-nav">
+                        <li><a href="#/sparksqlweb/history/overview">Overview</a></li>
+                        <li><a href="#/sparksqlweb/history/detail">Detail</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="span11">
+            <div id="jobsummary_last2weeks" style="height: 400px"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(document).ready(function () {
+
+    $("#jobsummary_last2weeks").kendoChart({
+        dataSource: {
+            transport: {
+                read: "/rest/sparksql/jobsummary_last2weeks"
+            }
+        },
+        chartArea: {
+            height: 400
+        },
+        title: {
+            text: "SparkSQL Job "
+        },
+        legend: {
+            position: "top"
+        },
+        seriesDefaults: {
+            type: "column",
+                stack: true
+        },
+        series:
+                [{
+                    field: "success",
+                    name: "SUCCESS"
+                },{
+                    field: "analysisexception",
+                    name: "AnalysisException"
+                },{
+                  field: "sparkexception",
+                  name: "SparkException"
+                },{
+                  field: "sparkthriftserverexception",
+                  name: "SparkThriftServerException"
+                },{
+                  field: "otherexception",
+                  name: "OtherException"
+                }],
+        seriesColors: ["lightgreen", "gold", "red", "DarkOrange", "Orchid"],
+        categoryAxis: {
+            field: "rundate",
+            labels: {
+                rotation: -90
+            },
+            majorGridLines: {
+                visible: false
+            },
+          axisCrossingValues: [0, 100, 100, 100, 100]
+        },
+        valueAxis: {
+            labels: {
+                format: "N0"
+            },
+            line: {
+                visible: false
+            }
+        },
+        valueAxes: [{
+            name: "success",
+            title: { text: "SUCCESS JOBCOUNT",visible: false },
+            color: "lightgreen",
+            min: 0
+        },{
+            name: "analysisexception",
+            title: { text: "AnalysisException",visible: false },
+            color: "gold",
+            min: 0
+        },{
+          name: "sparkexception",
+          title: { text: "SparkException",visible: false },
+          color: "red",
+          min: 0
+        },{
+          name: "sparkthriftserverexception",
+          title: { text: "SparkThriftServerException",visible: false },
+          color: "DarkOrange",
+          min: 0
+        },{
+          name: "otherexception",
+          title: { text: "OtherException",visible: false },
+          color: "Orchid",
+          min: 0
+        }   ],
+        tooltip: {
+            visible: true,
+            format: "N0"
+        }
+
+    });
+
+    var serviceRoot = "/rest/sparksql/history";
+
+});
+
+</script>
+
+
+</div>

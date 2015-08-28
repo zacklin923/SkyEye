@@ -1,0 +1,72 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET         /                                                controllers.Application.index
+
+# Map static resources from the /public folder to the /assets URL path
+GET         /assets/*file                                    controllers.Assets.at(path="/public", file)
+
+# HDFS
+GET         /rest/hdfs/nodes                                 controllers.HDFSController.nodes()
+GET         /rest/hdfs/capacity                              controllers.HDFSController.capacity()
+GET         /rest/hdfs/blocks                                controllers.HDFSController.blocks()
+GET         /rest/hdfs/liststatus                            controllers.HDFSController.listStatus(pathSuffix:String ?= "/")
+GET         /rest/hdfs/getcontentsummary                     controllers.HDFSController.contentSummary(pathSuffix:String ?= "/")
+GET         /rest/hdfs/du                                    controllers.HDFSController.du(path:String ?= "/")
+GET         /rest/hdfs/dailydu                               controllers.HDFSDUController.dailydu(path:String ?= "/")
+
+# Yarn
+GET         /rest/yarn/nodes                                 controllers.YarnController.nodes()
+GET         /rest/yarn/vcores                                controllers.YarnController.vcores()
+GET         /rest/yarn/memory                                controllers.YarnController.memory()
+GET         /rest/yarn/appSummary                            controllers.YarnController.appSummary()
+GET         /rest/yarn/apps                                  controllers.YarnController.apps(user:String ?="", queue:String ?="" ,startedTimeBegin:String ?="", startedTimeEnd:String ?="", limit:String ?="", state:String ?="", finalStatus:String ?="")
+
+# SparkonYarn
+GET         /rest/sparkonyarn/nodes                          controllers.SparkOnYarnController.nodes()
+GET         /rest/sparkonyarn/vcores                         controllers.SparkOnYarnController.vcores()
+GET         /rest/sparkonyarn/memory                         controllers.SparkOnYarnController.memory()
+GET         /rest/sparkonyarn/appSummary                     controllers.SparkOnYarnController.appSummary()
+GET         /rest/sparkonyarn/apps                           controllers.SparkOnYarnController.apps(user:String ?="", queue:String ?="" ,startedTimeBegin:String ?="", startedTimeEnd:String ?="", limit:String ?="", state:String ?="", finalStatus:String ?="")
+
+
+# Cluster Cost
+GET         /rest/clustercost/summary                        controllers.ClusterCostController.summary(start:String ?="", end:String ?="", orderBy:String ?="rundate", order:String ?="asc")
+GET         /rest/clustercost/byproject                      controllers.ClusterCostController.byProject(project:String ?= "", start:String ?= "", end:String ?= "", orderBy:String ?="project", order:String ?="asc")
+GET         /rest/clustercost/detailbill                     controllers.ClusterCostController.bill(project:String ?= "", start:String ?= "", end:String ?= "", orderBy:String ?="project,cluster,user,rundate", order:String ?="asc")
+
+
+# MRv2 Job
+GET         /rest/mrv2job/jobstat_today                      controllers.MRv2JobController.jobStatOfToday()
+GET         /rest/mrv2job/failedjobs_last24hours             controllers.MRv2JobController.failedJobsOfLast24hours(orderBy:String ?="jobId", order:String ?="desc")
+GET         /rest/mrv2job/longrunningjobs_last24hours        controllers.MRv2JobController.longRunningJobsOfLast24hours()
+GET         /rest/mrv2job/jobsummary_last2weeks              controllers.MRv2JobController.jobSummaryOfLast2weeks(jobtype:String ?="all")
+GET         /rest/mrv2job/jobstat_last2weeks                 controllers.MRv2JobController.jobStatOfLast2weeks()
+GET         /rest/mrv2job/jobhistory_perday                  controllers.MRv2JobController.jobhistoryPerDay(jobshortname:String, rundate:String)
+GET         /rest/mrv2job/jobhistory                         controllers.MRv2JobHistoryController.jobhistory(user:String ?="", queue:String ?="" ,startedTimeBegin:String ?="", startedTimeEnd:String ?="", limit:String ?="", state:String ?="SUCCEEDED")
+GET         /rest/mrv2job/jobinfo                            controllers.MRv2JobController.jobinfo(jobname:String ?="", start:String ?= "", end:String ?="")
+
+
+# WebHCat
+GET         /rest/webhcat/databases                          controllers.WebHCatController.databases()
+GET         /rest/webhcat/tables                             controllers.WebHCatController.tables(database:String)
+GET         /rest/webhcat/partitions                         controllers.WebHCatController.partitions(database:String,table:String)
+GET         /rest/webhcat/columns                            controllers.WebHCatController.columns(database:String,table:String)
+GET         /rest/webhcat/properties                         controllers.WebHCatController.properties(database:String,table:String)
+
+# SparkSQL
+GET         /rest/sparksql/webuiurl                          controllers.SparkSQLJDBCController.getServerWebUIURL()
+POST        /rest/sparksql/runsqljdbc                        controllers.SparkSQLJDBCController.runSQLQuery(save:Boolean)
+GET         /rest/sparksql/fetchresult                       controllers.SparkSQLJDBCController.fetchResult(resulttable:String, limit:String ?="1000")
+GET         /rest/sparksql/history                           controllers.SparkSQLHistoryController.list(user:String ?= null, startedTimeBegin:String ?="", startedTimeEnd:String ?="", retcode:String ?="", orderBy:String ?= "startTime", order:String ?= "desc")
+GET         /rest/sparksql/jobsummary_last2weeks             controllers.SparkSQLHistoryController.jobSummaryOfLast2weeks()
+GET         /rest/sparksql/allresults                        controllers.SparkSQLJDBCController.downloadAllResults(execId:String)
+
+# Hive
+POST        /rest/hive/runsqljdbc                            controllers.HiveJDBCController.runSQLQuery()
+
+
+#WebSocket
+GET         /rest/ws                                         controllers.Application.socket
