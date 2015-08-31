@@ -8,6 +8,8 @@ GET         /                                                controllers.Applica
 # Map static resources from the /public folder to the /assets URL path
 GET         /assets/*file                                    controllers.Assets.at(path="/public", file)
 
+GET         /dailybill                                       controllers.DailyBillController.dailyBill(project:String ?=null, date:String, orderBy:String ?="total_cost", order:String ?="desc")
+
 # HDFS
 GET         /rest/hdfs/nodes                                 controllers.HDFSController.nodes()
 GET         /rest/hdfs/capacity                              controllers.HDFSController.capacity()
