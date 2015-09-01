@@ -188,6 +188,8 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
 
         ObjectNode response = Json.newObject();
 
+        String execId = resulttable.split("_")[1];
+
         Statement stmt = null;
         ResultSet rs = null;
         try {
@@ -201,7 +203,7 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
 
             JsonNode result = resultSet2Json(rs);
             response.put("retcode", 0);
-            response.put("message", "OK, results fetched back");
+            response.put("message", "OK, top "+limit+" results fetched back. <p> You should download all result <a href='/rest/sparksql/allresults?execId="+execId+"' target='_blank'><b style='color: red;'>here</b></a>");
             response.put("result", result);
             return ok(response);
 
@@ -252,7 +254,6 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
 
             // save result
             if (response != null) {
-                String execId = resulttable.split("_")[1];
                 saveResult(response, "public/results/" + execId + ".result.json");
             }
         }//end try

@@ -249,6 +249,9 @@
                                     }else{
                                         console.log("fetching resulttable. ");
                                         var resulttable = result['resulttable']
+                                        var execId = resulttable.split("_")[1]
+                                        $("#message").html("fetching result of top "+resultlimit+" <p> Please wait... <p> You should download all result <a href='/rest/sparksql/allresults?execId="+execId+"' target='_blank'><b style='color: red;'>here</b></a>");
+
                                         $.ajax({
                                             url: "/rest/sparksql/fetchresult?resulttable="+resulttable+"&limit="+resultlimit,
                                             success: function(tableresult){
