@@ -2,8 +2,7 @@ package controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-import java.beans.PropertyVetoException;
+
 import java.sql.*;
 
 import play.*;
@@ -19,31 +18,16 @@ public class HiveJDBCController extends AbstractJDBCController {
     static final String USER = Play.application().configuration().getString("hive.thriftserver.jdbc.user");
     static final String PASSWORD = Play.application().configuration().getString("hive.thriftserver.jdbc.password");
 
-    static ComboPooledDataSource cpds = null;
-
     static Connection conn = null;
 
-    static {
-
-        Logger.info("Initializeing Hive JDBC Connection Pool ...");
-
-        cpds = new ComboPooledDataSource();
-
-        try {
-            cpds.setDriverClass(JDBC_DRIVER);
-            cpds.setJdbcUrl(DB_URL);
-            cpds.setUser(USER);
-            cpds.setPassword(PASSWORD);
-            cpds.setMaxPoolSize(10);
-            cpds.setMinPoolSize(1);
-            cpds.setAcquireIncrement(3);
-            cpds.setCheckoutTimeout(3000);
-            cpds.setIdleConnectionTestPeriod(120);
-            cpds.setMaxIdleTime(3600);
-        } catch (PropertyVetoException e) {
-            e.printStackTrace();
-            Logger.error("ERROR initializing Hive JDBC Connection Pool : " + e.getLocalizedMessage());
+    private static Connection getConnection() throws ClassNotFoundException, SQLException {
+        if (conn == null) {
+            Logger.info("Initializeing Hive JDBC Connection ...");
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(DB_URL, USER, PASSWORD);
         }
+        Logger.info("Got a Hive JDBC Connection ..");
+        return conn;
     }
 
 
@@ -62,9 +46,10 @@ public class HiveJDBCController extends AbstractJDBCController {
             return ok(response);
         } catch (Exception e) {
             Logger.error("ERROR executing Hive sql : " + sql + ", Internal Server Exception" + e.getMessage());
+
             ObjectNode errResponse = Json.newObject();
-            errResponse.put("retcode", -1);
-            errResponse.put("message", "Internal Server Exception: " + e.getMessage());
+            errResponse.put("retcode", response.get("retcode"));
+            errResponse.put("message", "Internal Server Exception: " + response.get("message"));
             return ok(errResponse);
         }
 
@@ -79,9 +64,8 @@ public class HiveJDBCController extends AbstractJDBCController {
         ResultSet rs = null;
         try {
 
-            conn = cpds.getConnection();
+            conn = getConnection();
             stmt = conn.createStatement();
-
 
             Logger.info("RUNNING Hive SQL : " + sql);
             rs = stmt.executeQuery(sql);
@@ -95,30 +79,37 @@ public class HiveJDBCController extends AbstractJDBCController {
             response.put("result", result);
             return response;
 
-        } catch (Exception se) {
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+            Logger.error("ClassNotFount Exception, please check your classpath whether including hive-jdbc driver class : " + e.getMessage());
+
+            response.put("retcode", -1);
+            response.put("message", e.getMessage());
+            return response;
+        } catch (SQLException se) {
             //Handle errors for JDBC
             se.printStackTrace();
             Logger.error("SQL Exception: " + se.getMessage());
+
             response.put("retcode", 1);
             response.put("message", se.getMessage());
-
             return response;
-
         } finally {
             //finally block used to close resources
             try {
+                if (rs != null)
+                    rs.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+                Logger.error("SQL Exception: " + se.getLocalizedMessage());
+            }
+            try {
                 if (stmt != null)
                     stmt.close();
-            } catch (SQLException se2) {
-                Logger.error("SQL Exception: " + se2.getLocalizedMessage());
-                se2.printStackTrace();
+            } catch (SQLException se) {
+                se.printStackTrace();
+                Logger.error("SQL Exception: " + se.getLocalizedMessage());
             }// nothing we can do
-            try {
-                conn.close();
-            } catch (SQLException e) {
-                Logger.error("SQL Exception: " + e.getLocalizedMessage());
-                e.printStackTrace();
-            }
         }//end try
 
     }
