@@ -3,8 +3,10 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import java.beans.PropertyVetoException;
 import java.sql.*;
 
+import com.mchange.v2.c3p0.ComboPooledDataSource;
 import play.*;
 import play.data.*;
 import play.libs.Json;
@@ -18,16 +20,28 @@ public class HiveJDBCController extends AbstractJDBCController {
     static final String USER = Play.application().configuration().getString("hive.thriftserver.jdbc.user");
     static final String PASSWORD = Play.application().configuration().getString("hive.thriftserver.jdbc.password");
 
+    static ComboPooledDataSource cpds = null;
     static Connection conn = null;
 
-    private static Connection getConnection() throws ClassNotFoundException, SQLException {
-        if (conn == null) {
-            Logger.info("Initializeing Hive JDBC Connection ...");
-            Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL, USER, PASSWORD);
+    static {
+        Logger.info("Initializeing Hive JDBC Connection Pool ...");
+        cpds = new ComboPooledDataSource();
+
+        try {
+            cpds.setDriverClass(JDBC_DRIVER);
+            cpds.setJdbcUrl(DB_URL);
+            cpds.setUser(USER);
+            cpds.setPassword(PASSWORD);
+            cpds.setMaxPoolSize(15);
+            cpds.setMinPoolSize(10);
+            cpds.setAcquireIncrement(3);
+            cpds.setCheckoutTimeout(3000);
+            cpds.setIdleConnectionTestPeriod(120);
+            cpds.setMaxIdleTime(3600);
+        } catch (PropertyVetoException e) {
+            e.printStackTrace();
+            Logger.error("ERROR initializing Hive JDBC Connection Pool : " + e.getLocalizedMessage());
         }
-        Logger.info("Got a Hive JDBC Connection ..");
-        return conn;
     }
 
 
@@ -64,7 +78,7 @@ public class HiveJDBCController extends AbstractJDBCController {
         ResultSet rs = null;
         try {
 
-            conn = getConnection();
+            conn = cpds.getConnection();
             stmt = conn.createStatement();
 
             Logger.info("RUNNING Hive SQL : " + sql);
@@ -79,13 +93,6 @@ public class HiveJDBCController extends AbstractJDBCController {
             response.put("result", result);
             return response;
 
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            Logger.error("ClassNotFount Exception, please check your classpath whether including hive-jdbc driver class : " + e.getMessage());
-
-            response.put("retcode", -1);
-            response.put("message", e.getMessage());
-            return response;
         } catch (SQLException se) {
             //Handle errors for JDBC
             se.printStackTrace();

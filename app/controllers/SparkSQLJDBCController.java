@@ -8,6 +8,10 @@ import java.sql.*;
 import java.util.*;
 import java.util.Date;
 
+import com.mchange.v2.c3p0.ComboPooledDataSource;
+
+import java.beans.PropertyVetoException;
+
 import models.*;
 
 import org.apache.hadoop.util.Shell;
@@ -26,16 +30,28 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
     static final String PASSWORD = Play.application().configuration().getString("sparksql.thriftserver.jdbc.password");
     static final String WEBUI_URL = Play.application().configuration().getString("sparksql.webui.url");
 
+    static ComboPooledDataSource cpds = null;
     static Connection conn = null;
 
-    private static Connection getConnection() throws ClassNotFoundException, SQLException {
-        if (conn == null) {
-            Logger.info("Initializeing SparkSQL JDBC Connection ...");
-            Class.forName(JDBC_DRIVER);
-            conn = DriverManager.getConnection(DB_URL, USER, PASSWORD);
+    static {
+        Logger.info("Initializeing SparkSQL JDBC Connection Pool ...");
+        cpds = new ComboPooledDataSource();
+
+        try {
+            cpds.setDriverClass(JDBC_DRIVER);
+            cpds.setJdbcUrl(DB_URL);
+            cpds.setUser(USER);
+            cpds.setPassword(PASSWORD);
+            cpds.setMaxPoolSize(15);
+            cpds.setMinPoolSize(10);
+            cpds.setAcquireIncrement(3);
+            cpds.setCheckoutTimeout(3000);
+            cpds.setIdleConnectionTestPeriod(120);
+            cpds.setMaxIdleTime(3600);
+        } catch (PropertyVetoException e) {
+            e.printStackTrace();
+            Logger.error("ERROR initializing SparkSQL JDBC Connection Pool : " + e.getLocalizedMessage());
         }
-        Logger.info("Got a SparkSQL JDBC Connection ..");
-        return conn;
     }
 
     public static Result getServerWebUIURL() {
@@ -116,7 +132,7 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
         ResultSet rs = null;
         try {
 
-            conn = getConnection();
+            conn = cpds.getConnection();
             stmt = conn.createStatement();
 
             String sqlexec = save ? "CREATE TABLE " + resulttable + " AS " + sql : sql;
@@ -136,13 +152,6 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
             }
             return response;
 
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            Logger.error("ClassNotFount Exception, please check your classpath whether including hive-jdbc driver class : " + e.getMessage());
-
-            response.put("retcode", -1);
-            response.put("message", e.getMessage());
-            return response;
         } catch (SQLException se) {
             //Handle errors for JDBC
             se.printStackTrace();
@@ -194,7 +203,7 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
         ResultSet rs = null;
         try {
 
-            conn = getConnection();
+            conn = cpds.getConnection();
             stmt = conn.createStatement();
 
             String sqlexec = "SELECT * FROM " + resulttable + " LIMIT " + limit;
@@ -203,17 +212,10 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
 
             JsonNode result = resultSet2Json(rs);
             response.put("retcode", 0);
-            response.put("message", "OK, top "+limit+" results fetched back. <p> You should download all result <a href='/rest/sparksql/allresults?execId="+execId+"' target='_blank'><b style='color: red;'>here</b></a>");
+            response.put("message", "OK, top " + limit + " results fetched back. <p> You should download all result <a href='/rest/sparksql/allresults?execId=" + execId + "' target='_blank'><b style='color: red;'>here</b></a>");
             response.put("result", result);
             return ok(response);
 
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-            Logger.error("ClassNotFount Exception, please check your classpath whether including hive-jdbc driver class : " + e.getMessage());
-
-            response.put("retcode", -1);
-            response.put("message", e.getMessage());
-            return ok(response);
         } catch (SQLException se) {
             //Handle errors for JDBC
             se.printStackTrace();
