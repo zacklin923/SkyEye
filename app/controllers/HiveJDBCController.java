@@ -35,7 +35,6 @@ public class HiveJDBCController extends AbstractJDBCController {
             cpds.setMaxPoolSize(15);
             cpds.setMinPoolSize(10);
             cpds.setAcquireIncrement(3);
-            cpds.setCheckoutTimeout(3000);
             cpds.setIdleConnectionTestPeriod(120);
             cpds.setMaxIdleTime(3600);
         } catch (PropertyVetoException e) {
