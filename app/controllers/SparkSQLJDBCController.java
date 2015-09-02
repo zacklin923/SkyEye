@@ -45,6 +45,7 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
             cpds.setMaxPoolSize(15);
             cpds.setMinPoolSize(10);
             cpds.setAcquireIncrement(3);
+            cpds.setCheckoutTimeout(5000);
             cpds.setIdleConnectionTestPeriod(120);
             cpds.setMaxIdleTime(3600);
         } catch (PropertyVetoException e) {
@@ -183,6 +184,13 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
             try {
                 if (stmt != null)
                     stmt.close();
+            } catch (SQLException se) {
+                se.printStackTrace();
+                Logger.error("SQL Exception: " + se.getLocalizedMessage());
+            }
+            try {
+                if (conn != null)
+                    conn.close();
             } catch (SQLException se) {
                 se.printStackTrace();
                 Logger.error("SQL Exception: " + se.getLocalizedMessage());
