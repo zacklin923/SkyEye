@@ -31,7 +31,6 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
     static final String WEBUI_URL = Play.application().configuration().getString("sparksql.webui.url");
 
     static ComboPooledDataSource cpds = null;
-    static Connection conn = null;
 
     static {
         Logger.info("Initializeing SparkSQL JDBC Connection Pool ...");
@@ -43,8 +42,8 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
             cpds.setUser(USER);
             cpds.setPassword(PASSWORD);
             cpds.setMaxPoolSize(15);
-            cpds.setMinPoolSize(10);
-            cpds.setAcquireIncrement(3);
+            cpds.setMinPoolSize(5);
+            cpds.setAcquireIncrement(5);
             cpds.setCheckoutTimeout(5000);
             cpds.setIdleConnectionTestPeriod(120);
             cpds.setMaxIdleTime(3600);
@@ -128,6 +127,7 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
 
         ObjectNode response = Json.newObject();
 
+        Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
         try {
@@ -206,6 +206,7 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
 
         String execId = resulttable.split("_")[1];
 
+        Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
         try {

@@ -21,7 +21,6 @@ public class HiveJDBCController extends AbstractJDBCController {
     static final String PASSWORD = Play.application().configuration().getString("hive.thriftserver.jdbc.password");
 
     static ComboPooledDataSource cpds = null;
-    static Connection conn = null;
 
     static {
         Logger.info("Initializeing Hive JDBC Connection Pool ...");
@@ -32,9 +31,9 @@ public class HiveJDBCController extends AbstractJDBCController {
             cpds.setJdbcUrl(DB_URL);
             cpds.setUser(USER);
             cpds.setPassword(PASSWORD);
-            cpds.setMaxPoolSize(15);
-            cpds.setMinPoolSize(10);
-            cpds.setAcquireIncrement(3);
+            cpds.setMaxPoolSize(5);
+            cpds.setMinPoolSize(1);
+            cpds.setAcquireIncrement(2);
             cpds.setCheckoutTimeout(5000);
             cpds.setIdleConnectionTestPeriod(120);
             cpds.setMaxIdleTime(3600);
@@ -74,6 +73,7 @@ public class HiveJDBCController extends AbstractJDBCController {
 
         ObjectNode response = Json.newObject();
 
+        Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
         try {
