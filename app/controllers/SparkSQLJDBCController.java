@@ -144,9 +144,11 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
             response.put("retcode", 0);
 
             if (save) {
+                response.put("execId", execId);
                 response.put("message", "OK, results saved as table : " + resulttable);
                 response.put("resulttable", resulttable);
             } else {
+                response.put("execId", execId);
                 response.put("message", "OK, results are as follows");
                 response.put("result", result);
             }
@@ -170,6 +172,7 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
                 // unknown exception
                 response.put("retcode", 100);
             }
+            response.put("execId", execId);
             response.put("message", se.getMessage());
             return response;
         } finally {
