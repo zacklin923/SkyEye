@@ -304,7 +304,7 @@ function showResult(e) {
     $.ajax(
             {
                 type: 'GET',
-                url: '/assets/results/' + dataItem.resultFile,
+                url: '/rest/sparksql/result/' + dataItem.resultFile,
                 dataType: 'json',
                 success: function (result, textStatus) {
                     var retcode = result['retcode']

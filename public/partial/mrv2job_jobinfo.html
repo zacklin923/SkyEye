@@ -24,7 +24,6 @@
                 <button class="submitButton k-button" id="submit">Submit</button>
             </form>
             <div id="jobinfo"></div>
-            <div id="window"></div>
         </div>
     </div>
 </div>
@@ -96,7 +95,6 @@
                 pageSize: 20
             },
             height: 600,
-            detailInit: jobwatcher,
 //                dataBound: function() {
 //                    this.expandRow(this.tbody.find("tr.k-master-row").first());
 //                },
@@ -173,67 +171,9 @@
                     title: "REDUCE_MEMORY",
                     width: 80
                 },
-                {command: { text: "watch", click: watchJob }, title: "WATCH", width: "80px" }
             ]
         });
 
-      function jobwatcher(e) {
-
-        $("<div/>").appendTo(e.detailCell).kendoGrid({
-          dataSource: {
-            transport: {
-              read: "/rest/mrv2job/jobwatcher?jobname=" + e.data.jobshortname
-            }
-          },
-          height: 100,
-          columns: [
-            {
-              field: "jobName",
-              title: "jobName",
-              width: 300
-            },
-            {
-              field: "jobOwner",
-              title: "jobOwner",
-              width: 100
-            },
-            {
-              field: "jobOwnerPhone",
-              title: "jobOwnerPhone",
-              width: 180
-            },
-            {
-              field: "onCallName",
-              title: "onCallName",
-              width: 100
-            },
-            {
-              field: "onCallPhone",
-              title: "onCallPhone",
-              width: 180
-            }
-          ]
-        });
-      };
-
-
-      function watchJob(e) {
-        var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
-
-        var jobname = dataItem.jobshortname
-
-        var window = $("#window").kendoWindow({
-          height: "550px",
-          width: "400px",
-          modal: true,
-          resizable: true,
-          draggable: true,
-          title: "Job Watcher",
-          content: "/mrv2job/watcherinfo?jobname="+jobname,
-          visible: false /*don't show it yet*/
-        }).data("kendoWindow").center().open();
-
-      }
     });
 
 </script>

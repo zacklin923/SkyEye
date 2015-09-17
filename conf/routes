@@ -61,14 +61,12 @@ GET         /rest/webhcat/properties                         controllers.WebHCat
 # SparkSQL
 GET         /rest/sparksql/webuiurl                          controllers.SparkSQLJDBCController.getServerWebUIURL()
 POST        /rest/sparksql/runsqljdbc                        controllers.SparkSQLJDBCController.runSQLQuery(save:Boolean)
-GET         /rest/sparksql/fetchresult                       controllers.SparkSQLJDBCController.fetchResult(resulttable:String, limit:String ?="1000")
+GET         /rest/sparksql/fetchresult                       controllers.SparkSQLJDBCController.fetchResult(execId:Long, limit:String ?="1000")
 GET         /rest/sparksql/history                           controllers.SparkSQLHistoryController.list(user:String ?= null, startedTimeBegin:String ?="", startedTimeEnd:String ?="", retcode:String ?="", orderBy:String ?= "startTime", order:String ?= "desc")
 GET         /rest/sparksql/jobsummary_last2weeks             controllers.SparkSQLHistoryController.jobSummaryOfLast2weeks()
-GET         /rest/sparksql/allresults                        controllers.SparkSQLJDBCController.downloadAllResults(execId:String)
+GET         /rest/sparksql/allresults                        controllers.SparkSQLJDBCController.downloadAllResults(execId:Long)
+GET         /rest/sparksql/result/*file                      controllers.ExternalAssetsController.at(rootPath = "/data/skyeye/results", file)
 
 # Hive
 POST        /rest/hive/runsqljdbc                            controllers.HiveJDBCController.runSQLQuery()
 
-
-#WebSocket
-GET         /rest/ws                                         controllers.Application.socket

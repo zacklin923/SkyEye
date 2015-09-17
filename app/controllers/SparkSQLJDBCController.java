@@ -101,7 +101,8 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
         } finally {
 
             // update history to db
-            String savedFilename = histroy.getId() + ".result.json";
+            Long execId = histroy.getId();
+            String savedFilename = execId + ".result.json";
             histroy.setFinishTime(new Date());
             histroy.setMessage(response.get("message") != null ? response.get("message").asText() : "");
             histroy.setRetcode(response.get("retcode") != null ? response.get("retcode").asInt() : -1);
@@ -112,7 +113,7 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
             if (!save) {
                 // save result
                 if (response != null) {
-                    saveResult(response, "public/results/" + savedFilename);
+                    saveResult(response, savedFilename);
                 }
             }
 
@@ -203,11 +204,11 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
     }
 
 
-    public static Result fetchResult(String resulttable, String limit) {
+    public static Result fetchResult(Long execId, String limit) {
 
         ObjectNode response = Json.newObject();
 
-        String execId = resulttable.split("_")[1];
+        String resulttable = "tmp.result_" + execId;
 
         Connection conn = null;
         Statement stmt = null;
@@ -267,7 +268,7 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
 
             // save result
             if (response != null) {
-                saveResult(response, "public/results/" + execId + ".result.json");
+                saveResult(response, execId + ".result.json");
             }
         }//end try
 
@@ -278,7 +279,7 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
 
         try {
             writer = new BufferedWriter(new OutputStreamWriter(
-                    new FileOutputStream(filename), "utf-8"));
+                    new FileOutputStream(new File("/data/skyeye/results",filename)), "utf-8"));
             writer.write(result.toString());
         } catch (IOException ex) {
             // report
@@ -291,11 +292,11 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
         }
     }
 
-    public static Result downloadAllResults(String execId) {
+    public static Result downloadAllResults(Long execId) {
         response().setContentType("application/x-download");
         response().setHeader("Content-disposition", "attachment; filename=result_" + execId + ".tsv");
 
-        File resultfile = new File(Play.application().path(), "public/results/" + execId + ".result.all");
+        File resultfile = new File("/data/skyeye/results/", execId + ".result.all");
         if (!resultfile.exists()) {
             fetchHiveData("tmp.result_" + execId, resultfile.getAbsolutePath());
         }
@@ -314,7 +315,7 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
 
         Shell.ShellCommandExecutor shExec = null;
         // Setup command to run
-        String[] command = {"/opt/hive/bin/hive", "-e", "\"" + sql + "\""};
+        String[] command = {"hive", "-e", "\"" + sql + "\""};
 
         Logger.info("executing command: " + Arrays.toString(command));
         try {
