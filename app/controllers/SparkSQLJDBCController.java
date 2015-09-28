@@ -47,6 +47,8 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
             cpds.setCheckoutTimeout(5000);
             cpds.setIdleConnectionTestPeriod(120);
             cpds.setMaxIdleTime(3600);
+            cpds.setMaxStatements(0);
+            cpds.setMaxStatementsPerConnection(0);
         } catch (PropertyVetoException e) {
             e.printStackTrace();
             Logger.error("ERROR initializing SparkSQL JDBC Connection Pool : " + e.getLocalizedMessage());
