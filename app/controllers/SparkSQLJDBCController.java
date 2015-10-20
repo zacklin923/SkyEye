@@ -42,14 +42,12 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
             cpds.setUser(USER);
             cpds.setPassword(PASSWORD);
             cpds.setMaxPoolSize(50);
-            cpds.setMinPoolSize(5);
-            cpds.setAcquireIncrement(5);
+            cpds.setMinPoolSize(2);
+            cpds.setAcquireIncrement(1);
             cpds.setCheckoutTimeout(5000);
             cpds.setIdleConnectionTestPeriod(120);
             cpds.setUnreturnedConnectionTimeout(60);
             cpds.setMaxIdleTime(3600);
-            cpds.setMaxIdleTimeExcessConnections(3600);
-            cpds.setMaxConnectionAge(3600);
             cpds.setMaxStatements(0);
             cpds.setMaxStatementsPerConnection(0);
 
