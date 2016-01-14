@@ -318,10 +318,11 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
 
         Shell.ShellCommandExecutor shExec = null;
         // Setup command to run
-        String[] command = {"hive", "-e", "\"" + sql + "\""};
+        String[] command = {"sh","-c","hive -e \"" + sql + "\" >" + resultfile};
 
-        Logger.info("executing command: " + Arrays.toString(command));
         try {
+
+            Logger.info("executing command: " + Arrays.toString(command));
 
             shExec = new Shell.ShellCommandExecutor(command, new File("/tmp"));
             shExec.execute();
@@ -330,26 +331,30 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
             Logger.warn("Exit code from command is : " + exitCode);
             String message = shExec.getOutput();
 
-            Writer writer = null;
-            try {
-                writer = new BufferedWriter(new OutputStreamWriter(
-                        new FileOutputStream(resultfile), "utf-8"));
-                writer.write(message);
-            } catch (IOException ex) {
-                // report
-                ex.printStackTrace();
-                Logger.warn("error saving result to file : " + resultfile + " , " + ex.getMessage());
-            } finally {
-                try {
-                    writer.close();
-                } catch (Exception ex) {
-                }
+            if (exitCode != 0 ){
+                Logger.error("error while fetching result data, message: " + message);
             }
+
+//            Writer writer = null;
+//            try {
+//                writer = new BufferedWriter(new OutputStreamWriter(
+//                        new FileOutputStream(resultfile), "utf-8"));
+//                writer.write(message);
+//            } catch (IOException ex) {
+//                // report
+//                ex.printStackTrace();
+//                Logger.warn("error saving result to file : " + resultfile + " , " + ex.getMessage());
+//            } finally {
+//                try {
+//                    writer.close();
+//                } catch (Exception ex) {
+//                }
+//            }
 
         } catch (IOException e) {
             int exitCode = shExec.getExitCode();
             String message = shExec.getOutput();
-            Logger.error("IOException when running command : " + Arrays.toString(command) + ", exitcode is " + exitCode + ", " + e.getMessage() + ", message: " + message);
+            Logger.error("IOException when running command : " + Arrays.toString(command) + ", exitcode is " + exitCode + ", exception: " + e.getMessage() + ", message: " + message);
         }
     }
 
