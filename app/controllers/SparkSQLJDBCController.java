@@ -314,7 +314,7 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
 
         List<JsonNode> result = new ArrayList<JsonNode>();
 
-        String sql = "set hive.cli.print.header=true;select * from " + table;
+        String sql = "set hive.cli.print.header=true;set hive.resultset.use.unique.column.names=false; select * from " + table;
 
         Shell.ShellCommandExecutor shExec = null;
         // Setup command to run
