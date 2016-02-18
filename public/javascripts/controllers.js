@@ -5,7 +5,7 @@ angular.module('dashboard.controllers', [])
                         {url: '/cluster',       name: 'Cluster'},
                         {url: '/clustercost',       name: 'Cost'},
                         {url: '/hdfs',       name: 'HDFS'},
-                        {url: '/mrv2job',   name: 'MRv2 Jobs'},
+                        {url: '/mrv2job',   name: 'MR Jobs'},
                         {url: '/yarnapps',   name: 'Yarn Apps'},
                         {url: '/sparksqlweb',   name: 'SparkSQL'},
                         {url: '/mvdw',   name: 'MVDW'},

@@ -30,7 +30,7 @@ object HDFSController extends Controller {
       .get()
       .map {
       response => {
-        val fsState = response.json.\("beans")(28)
+        val fsState = response.json.\("beans")(31)
         Ok(Json.arr(
           Json.obj("category" -> "live", "value" -> fsState \ "NumLiveDataNodes"),
           Json.obj("category" -> "dead", "value" -> fsState \ "NumDeadDataNodes")
@@ -45,7 +45,7 @@ object HDFSController extends Controller {
       .get()
       .map {
       response => {
-        val fsState = response.json.\("beans")(6)
+        val fsState = response.json.\("beans")(8)
         Ok(Json.arr(
           Json.obj("category" -> "used", "value" -> fsState \ "CapacityUsedGB"),
           Json.obj("category" -> "remaining", "value" -> fsState \ "CapacityRemainingGB")
@@ -60,7 +60,7 @@ object HDFSController extends Controller {
       .get()
       .map {
       response => {
-        val fsState = response.json.\("beans")(6)
+        val fsState = response.json.\("beans")(8)
         Ok(Json.arr(
           Json.obj("category" -> "used", "value" -> fsState \ "BlocksTotal"),
           Json.obj("category" -> "remaining", "value" -> ((fsState \ "BlockCapacity").as[Int] - (fsState \ "BlocksTotal").as[Int])),

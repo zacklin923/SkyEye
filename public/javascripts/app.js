@@ -12,17 +12,9 @@ var brewingTools = angular.module('dashboard', ['kendo.directives', 'dashboard.c
                 controller: 'ClusterController',
                 templateUrl: '/assets/partial/cluster_hdfs.html'
             }).
-            when('/cluster/mrv1', {
-                controller: 'ClusterController',
-                templateUrl: '/assets/partial/cluster_mrv1.html'
-            }).
             when('/cluster/yarn', {
                 controller: 'ClusterController',
                 templateUrl: '/assets/partial/cluster_yarn.html'
-            }).
-            when('/cluster/sparkonyarn', {
-                controller: 'ClusterController',
-                templateUrl: '/assets/partial/cluster_sparkonyarn.html'
             }).
             when('/clustercost',{
                 redirectTo: '/clustercost/overview'

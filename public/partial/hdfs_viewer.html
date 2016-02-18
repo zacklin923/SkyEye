@@ -141,7 +141,7 @@
                             size: {
                                 type: "number",
                                 parse: function (value) {
-                                    return value / 1024 / 1024 / 1024;
+                                    return (value / 1024 / 1024 / 1024).toFixed(2);
                                 }
                             }
                         }
@@ -197,10 +197,10 @@
 
                             if (quota != "-1") {
 
-                                $("#size").html(size / 1024 / 1024 / 1024 + "  GB" + ", " + size / quota * 100 + " % used");
-                                $("#quota").html(quota / 1024 / 1024 / 1024 + "  GB");
+                                $("#size").html((size / 1024 / 1024 / 1024).toFixed(2) + "  GB" + ", " + (size / quota * 100).toFixed(2) + " % used");
+                                $("#quota").html((quota / 1024 / 1024 / 1024).toFixed(2) + "  GB");
                             } else {
-                                $("#size").html(size / 1024 / 1024 / 1024 + "  GB");
+                                $("#size").html((size / 1024 / 1024 / 1024).toFixed(2) + "  GB");
                                 $("#quota").html("No Quota");
                             }
 

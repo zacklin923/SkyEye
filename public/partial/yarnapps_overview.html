@@ -39,13 +39,6 @@
                     <option>KILLED</option>
                 </select>
 
-                <label>cluster : </label>
-                <select id="cluster" class="input-small">
-                    <option value="">--cluster--</option>
-                    <option selected="selected">Yarn</option>
-                    <option>SparkonYarn</option>
-                </select>
-
                 <button class="submitButton k-button" id="submit">Submit</button>
             </form>
 
@@ -105,14 +98,9 @@
             var queue = $("#queue").val();
             var state = $("#state").val();
             var finalStatus = $("#finalStatus").val();
-            var cluster = $("#cluster").val();
             var grid = $("#yarnapps").data("kendoGrid");
 
             var serviceURL = "/rest/yarn/apps";
-
-            if( cluster == "SparkonYarn"){
-                serviceURL = "/rest/sparkonyarn/apps"
-            }
 
             grid.dataSource.transport.options.read.url = serviceURL + "?startedTimeBegin=" + starttime + "&startedTimeEnd=" + endtime + "&user=" + user + "&name=" + name + "&queue=" + queue + "&state=" + state + "&finalStatus=" + finalStatus;
             grid.dataSource.read();

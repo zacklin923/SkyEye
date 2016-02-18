@@ -26,13 +26,6 @@ GET         /rest/yarn/memory                                controllers.YarnCon
 GET         /rest/yarn/appSummary                            controllers.YarnController.appSummary()
 GET         /rest/yarn/apps                                  controllers.YarnController.apps(user:String ?="", queue:String ?="" ,startedTimeBegin:String ?="", startedTimeEnd:String ?="", limit:String ?="", state:String ?="", finalStatus:String ?="")
 
-# SparkonYarn
-GET         /rest/sparkonyarn/nodes                          controllers.SparkOnYarnController.nodes()
-GET         /rest/sparkonyarn/vcores                         controllers.SparkOnYarnController.vcores()
-GET         /rest/sparkonyarn/memory                         controllers.SparkOnYarnController.memory()
-GET         /rest/sparkonyarn/appSummary                     controllers.SparkOnYarnController.appSummary()
-GET         /rest/sparkonyarn/apps                           controllers.SparkOnYarnController.apps(user:String ?="", queue:String ?="" ,startedTimeBegin:String ?="", startedTimeEnd:String ?="", limit:String ?="", state:String ?="", finalStatus:String ?="")
-
 
 # Cluster Cost
 GET         /rest/clustercost/summary                        controllers.ClusterCostController.summary(start:String ?="", end:String ?="", orderBy:String ?="rundate", order:String ?="asc")
