@@ -209,10 +209,10 @@
 
                             if (spaceQuota != "-1") {
 
-                                $("#spaceConsumed").html(spaceConsumed / 1024 / 1024 / 1024 + "  GB" + ", " + spaceConsumed / spaceQuota * 100 + " % used");
-                                $("#spaceQuota").html(spaceQuota / 1024 / 1024 / 1024 + "  GB");
+                                $("#spaceConsumed").html((spaceConsumed / 1024 / 1024 / 1024).toFixed(2) + "  GB" + ", " + (spaceConsumed / spaceQuota * 100).toFixed(2) + " % used");
+                                $("#spaceQuota").html((spaceQuota / 1024 / 1024 / 1024).toFixed(2) + "  GB");
                             } else {
-                                $("#spaceConsumed").html(result['spaceConsumed'] / 1024 / 1024 / 1024 + "  GB");
+                                $("#spaceConsumed").html((spaceConsumed / 1024 / 1024 / 1024).toFixed(2) + "  GB");
                                 $("#spaceQuota").html("No Space Quota");
                             }
 

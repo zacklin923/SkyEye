@@ -75,7 +75,7 @@ public class HDFSDUController extends Controller {
 
                 ObjectNode eachfile = Json.newObject();
                 eachfile.put("parent", path);
-                String fullPath = line.split("\\s+")[1];
+                String fullPath = line.split("\\s+")[2];
                 String size = line.split("\\s+")[0];
                 eachfile.put("pathSuffix", fullPath.substring(fullPath.lastIndexOf("/") + 1));
                 eachfile.put("fullPath", fullPath);
