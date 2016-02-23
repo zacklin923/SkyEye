@@ -6,7 +6,7 @@
 
 <script>
 
-  var selected_table = document.getElementById("selected_table").innerText;
+  var selected_table = document.getElementById("selected_table").innerHTML;
   $('#tableschema_messagebar').html("Schema of Table : " + selected_table);
 
   var db_table = selected_table.split('.');
