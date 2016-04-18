@@ -40,12 +40,14 @@
                         <label for="file_count">File Count: </label>
 
                         <div id="file_count" style="color: darkred"></div>
-                        <label for="size">Size: </label>
-
-                        <div id="size" style="color: darkred"></div>
                         <label for="quota">Quota: </label>
 
                         <div id="quota" style="color: darkred"></div>
+
+                        <label for="size">Size: </label>
+
+                        <div id="size" style="color: darkred"></div>
+
                         <label for="spaceConsumed">Space Consumed: </label>
 
                         <div id="spaceConsumed" style="color: darkred"></div>
@@ -192,17 +194,16 @@
                             $("#directory_count").html(result['directoryCount']);
                             $("#file_count").html(result['fileCount']);
 
-                            var size = result['length'];
                             var quota = result['quota'];
 
                             if (quota != "-1") {
-
-                                $("#size").html((size / 1024 / 1024 / 1024).toFixed(2) + "  GB" + ", " + (size / quota * 100).toFixed(2) + " % used");
-                                $("#quota").html((quota / 1024 / 1024 / 1024).toFixed(2) + "  GB");
+                                $("#quota").html((quota));
                             } else {
-                                $("#size").html((size / 1024 / 1024 / 1024).toFixed(2) + "  GB");
                                 $("#quota").html("No Quota");
                             }
+
+                            var size = result['length'];
+                            $("#size").html((size / 1024 / 1024 / 1024).toFixed(2) + "  GB");
 
                             var spaceConsumed = result['spaceConsumed'];
                             var spaceQuota = result['spaceQuota'];
