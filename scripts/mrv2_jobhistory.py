@@ -109,7 +109,7 @@ def prepareJob(jobids):
 
 def save2DB(jobsummaries, jobcounters,jobconfs):
     try:
-        conn=MySQLdb.connect(host='adm1ss',user='root',passwd='root',port=3306)
+        conn=MySQLdb.connect(host='master.hadoop.mysql.s.mediav.com',user='hadoop',passwd='mediav4hadoop',port=30025)
         cur=conn.cursor()
         cur.executemany('REPLACE INTO hadoop.mrv2_job_summary (id,name,user,queue,state,startTime,finishTime,mapsTotal,mapsCompleted,reducesTotal,reducesCompleted,uberized,diagnostics,avgMapTime,avgReduceTime,avgShuffleTime,avgMergeTime,successfulMapAttempts,failedMapAttempts,killedMapAttempts,successfulReduceAttempts,failedReduceAttempts,killedReduceAttempts) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)',jobsummaries)
         cur.executemany('REPLACE INTO hadoop.mrv2_job_counters (id,HDFS_BYTES_READ,HDFS_BYTES_WRITTEN,MAP_INPUT_RECORDS,MAP_OUTPUT_RECORDS,REDUCE_INPUT_RECORDS,REDUCE_OUTPUT_RECORDS,MAP_OUTPUT_BYTES,REDUCE_SHUFFLE_BYTES,CPU_MILLISECONDS,GC_TIME_MILLIS) VALUES(%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)', jobcounters)
