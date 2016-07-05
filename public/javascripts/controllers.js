@@ -9,7 +9,7 @@ angular.module('dashboard.controllers', [])
                         {url: '/yarnapps',   name: 'Yarn Apps'},
                         {url: '/sparksqlweb',   name: 'SparkSQL'},
                         {url: '/mvdw',   name: 'MVDW'},
-                        {url: '/zeppelin',   name: 'Zeppelin'},
+                        {url: '/drelephant',   name: 'DrElephant'},
                         {url: '/rstudio',   name: 'RStudio'}
                         ];
 
