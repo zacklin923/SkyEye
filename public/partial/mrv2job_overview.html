@@ -137,27 +137,27 @@
                 title: { text: "TOTAL MAPS",visible: false },
                 color: "LightSkyBlue",
                 min: 0,
-                max: 2500000,
+                max: 10000000,
                 majorUnit: 500000
             },{
                 name: "total_reduces",
                 title: { text: "TOTAL REDUCES",visible: false },
                 color: "Gold",
                 min: 0,
-                max: 2500000,
+                max: 10000000,
                 majorUnit: 500000
             },{
                 name: "hdfs_read_tb",
                 title: { text: "HDFS SCANNED TB",visible: false },
                 color: "DarkRed",
                 min: 0,
-                max: 800
+                max: 1500
             },{
                 name: "hdfs_written_tb",
                 title: { text: "HDFS WRITTEN TB",visible: false },
                 color: "Orchid",
                 min: 0,
-                max: 800
+                max: 1500
             }],
             tooltip: {
                 visible: true,
@@ -541,7 +541,7 @@
 
         var dataItem = this.dataItem($(e.currentTarget).closest("tr"));
         console.log(dataItem);
-        window.open("http://jt2dg.prod.mediav.com:19888/jobhistory/job/"+dataItem.jobid, '_blank');
+        window.open("http://rm3ss.prod.mediav.com:19888/jobhistory/job/"+dataItem.jobid, '_blank');
 
     }
 

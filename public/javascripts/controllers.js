@@ -52,7 +52,7 @@ angular.module('dashboard.controllers', [])
 
   }])
 
-  .controller('ZeppelinController', ['$scope', function($scope) {
+  .controller('DrelephantController', ['$scope', function($scope) {
 
   }])
 

@@ -1,10 +1,10 @@
 var brewingTools = angular.module('dashboard', ['kendo.directives', 'dashboard.controllers'])
-	.config(['$routeProvider', function($routeProvider) {
-		$routeProvider.
-		    when('/', {
-		      controller: 'IndexController',
-		      templateUrl: '/assets/partial/index.html'
-		    }).
+    .config(['$routeProvider', function ($routeProvider) {
+        $routeProvider.
+            when('/', {
+                controller: 'IndexController',
+                templateUrl: '/assets/partial/index.html'
+            }).
             when('/cluster', {
                 redirectTo: '/cluster/hdfs'
             }).
@@ -16,7 +16,7 @@ var brewingTools = angular.module('dashboard', ['kendo.directives', 'dashboard.c
                 controller: 'ClusterController',
                 templateUrl: '/assets/partial/cluster_yarn.html'
             }).
-            when('/clustercost',{
+            when('/clustercost', {
                 redirectTo: '/clustercost/overview'
             }).
             when('/clustercost/overview', {
@@ -31,7 +31,7 @@ var brewingTools = angular.module('dashboard', ['kendo.directives', 'dashboard.c
                 controller: 'ClusterCostController',
                 templateUrl: '/assets/partial/clustercost_bill.html'
             }).
-            when('/hdfs',{
+            when('/hdfs', {
                 redirectTo: '/hdfs/rawlogsize'
             }).
             when('/hdfs/rawlogsize', {
@@ -39,12 +39,12 @@ var brewingTools = angular.module('dashboard', ['kendo.directives', 'dashboard.c
                 templateUrl: '/assets/partial/hdfs_rawlogsize.html'
             }).
             when('/hdfs/sessionlogsize', {
-              controller: 'HDFSController',
-              templateUrl: '/assets/partial/hdfs_sessionlogsize.html'
+                controller: 'HDFSController',
+                templateUrl: '/assets/partial/hdfs_sessionlogsize.html'
             }).
             when('/hdfs/dwsize', {
-              controller: 'HDFSController',
-              templateUrl: '/assets/partial/hdfs_dwsize.html'
+                controller: 'HDFSController',
+                templateUrl: '/assets/partial/hdfs_dwsize.html'
             }).
             when('/hdfs/viewer', {
                 controller: 'HDFSController',
@@ -78,8 +78,8 @@ var brewingTools = angular.module('dashboard', ['kendo.directives', 'dashboard.c
                 templateUrl: '/assets/partial/mrv2job_timeline.html'
             }).
             when('/mrv2job/jobinfo', {
-              controller: 'MRv1JobController',
-              templateUrl: '/assets/partial/mrv2job_jobinfo.html'
+                controller: 'MRv1JobController',
+                templateUrl: '/assets/partial/mrv2job_jobinfo.html'
             }).
             when('/yarnapps', {
                 redirectTo: '/yarnapps/overview'
@@ -126,16 +126,16 @@ var brewingTools = angular.module('dashboard', ['kendo.directives', 'dashboard.c
                 controller: 'MVDWController',
                 templateUrl: '/assets/partial/mvdw_db.html'
             }).
-            when('/zeppelin', {
-                controller: 'ZeppelinController',
-                templateUrl: '/assets/partial/zeppelin_overview.html'
+            when('/drelephant', {
+                controller: 'DrelephantController',
+                templateUrl: '/assets/partial/drelephant_overview.html'
             }).
             when('/rstudio', {
-              controller: 'RStudioController',
-              templateUrl: '/assets/partial/rstudio_overview.html'
+                controller: 'RStudioController',
+                templateUrl: '/assets/partial/rstudio_overview.html'
             }).
-		    otherwise({
-		      redirectTo: '/'
-		    });
+            otherwise({
+                redirectTo: '/'
+            });
 
-  }]);
+    }]);
