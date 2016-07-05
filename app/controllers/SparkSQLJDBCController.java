@@ -41,12 +41,12 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
             cpds.setJdbcUrl(DB_URL);
             cpds.setUser(USER);
             cpds.setPassword(PASSWORD);
-            cpds.setMaxPoolSize(100);
+            cpds.setMaxPoolSize(10);
             cpds.setMinPoolSize(2);
             cpds.setAcquireIncrement(2);
             cpds.setCheckoutTimeout(5000);
             cpds.setIdleConnectionTestPeriod(120);
-            cpds.setMaxIdleTime(3600);
+            cpds.setMaxIdleTime(43200);
             cpds.setMaxStatements(0);
             cpds.setMaxStatementsPerConnection(0);
 
@@ -134,6 +134,7 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
         Connection conn = null;
         Statement stmt = null;
         ResultSet rs = null;
+
         try {
 
             conn = cpds.getConnection();
@@ -142,16 +143,17 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
             String sqlexec = save ? "CREATE TABLE " + resulttable + " AS " + sql : sql;
 
             Logger.info("RUNNING Spark SQL : " + sqlexec);
-            rs = stmt.executeQuery(sqlexec);
-
-            JsonNode result = resultSet2Json(rs);
-            response.put("retcode", 0);
 
             if (save) {
+                boolean success = stmt.execute(sqlexec);
+                if (success) response.put("retcode", 0);
                 response.put("execId", execId);
                 response.put("message", "OK, results saved as table : " + resulttable);
                 response.put("resulttable", resulttable);
             } else {
+                rs = stmt.executeQuery(sqlexec);
+                JsonNode result = resultSet2Json(rs);
+                response.put("retcode", 0);
                 response.put("execId", execId);
                 response.put("message", "OK, results are as follows");
                 response.put("result", result);
