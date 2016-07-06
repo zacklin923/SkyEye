@@ -126,7 +126,7 @@ def main(starttimestamp_in_ms, endtimestamp_in_ms):
     httpClient = None
     try:
         mapreduce_hs_host = 'rm3ss.prod.mediav.com'
-        mapreduce_hs_jobs_url = '/ws/v1/history/mapreduce/jobs?startedTimeBegin='+starttimestamp_in_ms+'&startedTimeEnd='+endtimestamp_in_ms
+        mapreduce_hs_jobs_url = '/ws/v1/history/mapreduce/jobs?finishedTimeBegin='+starttimestamp_in_ms+'&finishedTimeEnd='+endtimestamp_in_ms
         httpClient = httplib.HTTPConnection(mapreduce_hs_host, 19888, timeout=30)
         httpClient.request('GET', mapreduce_hs_jobs_url)
 
