@@ -41,9 +41,9 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
             cpds.setJdbcUrl(DB_URL);
             cpds.setUser(USER);
             cpds.setPassword(PASSWORD);
-            cpds.setMaxPoolSize(10);
-            cpds.setMinPoolSize(2);
-            cpds.setAcquireIncrement(2);
+            cpds.setMaxPoolSize(3);
+            cpds.setMinPoolSize(1);
+            cpds.setAcquireIncrement(1);
             cpds.setCheckoutTimeout(5000);
             cpds.setIdleConnectionTestPeriod(120);
             cpds.setMaxIdleTime(43200);
@@ -145,8 +145,8 @@ public class SparkSQLJDBCController extends AbstractJDBCController {
             Logger.info("RUNNING Spark SQL : " + sqlexec);
 
             if (save) {
-                boolean success = stmt.execute(sqlexec);
-                if (success) response.put("retcode", 0);
+                stmt.execute(sqlexec);
+                response.put("retcode", 0);
                 response.put("execId", execId);
                 response.put("message", "OK, results saved as table : " + resulttable);
                 response.put("resulttable", resulttable);
