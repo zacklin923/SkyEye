@@ -67,7 +67,7 @@ def prepareJob(jobids):
                     elif p['name'] == 'mapreduce.job.inputformat.class':
                         conf['INPUTFORMAT'] = p['value']
                     elif p['name'] == 'mapreduce.output.fileoutputformat.outputdir':
-                        conf['OUTDIR'] = p['value']
+                        conf['OUTPUTDIR'] = p['value']
                     elif p['name'] == 'mapreduce.job.outputformat.class':
                         conf['OUTPUTFORMAT'] = p['value']
                     elif p['name'] == 'mapreduce.map.memory.mb':
