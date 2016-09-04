@@ -134,6 +134,10 @@ var brewingTools = angular.module('dashboard', ['kendo.directives', 'dashboard.c
                 controller: 'RStudioController',
                 templateUrl: '/assets/partial/rstudio_overview.html'
             }).
+            when('/cookiesearch', {
+                controller: 'CookieSearchController',
+                templateUrl: '/assets/partial/cookiesearch.html'
+            }).
             otherwise({
                 redirectTo: '/'
             });

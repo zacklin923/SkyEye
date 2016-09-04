@@ -10,7 +10,8 @@ angular.module('dashboard.controllers', [])
                         {url: '/sparksqlweb',   name: 'SparkSQL'},
                         {url: '/mvdw',   name: 'MVDW'},
                         {url: '/drelephant',   name: 'DrElephant'},
-                        {url: '/rstudio',   name: 'RStudio'}
+                        {url: '/rstudio',   name: 'RStudio'},
+                        {url: '/cookiesearch',   name: 'CookieSearch'}
                         ];
 
 
@@ -20,8 +21,8 @@ angular.module('dashboard.controllers', [])
     };
   }])
 
-  .controller('IndexController', ['$scope', function($scope) {       
-    
+  .controller('IndexController', ['$scope', function($scope) {
+
   }])
 
   .controller('HDFSController', ['$scope', function($scope) {
@@ -57,6 +58,9 @@ angular.module('dashboard.controllers', [])
   }])
 
   .controller('RStudioController', ['$scope', function($scope) {
+
+  }])
+  .controller('CookieSearchController', ['$scope', function($scope) {
 
   }])
 
