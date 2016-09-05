@@ -1,232 +1,168 @@
 <div class="container-fluid">
-    <div class="row-fluid">
-        <div>
-            <form class="form-inline">
-                <label for="start">Start: </label><input id="start" style="width: 220px"/>
-                <label for="end">End : </label><input id="end" style="width: 220px"/>
-                <label for="mvid">MVID: </label><input id="mvid" type="text" class="input-medium" placeholder="MVID" />
-                <label for="showRequestId">ShowRequestId: </label><input id="showRequestId" type="text" class="input-medium" placeholder="showRequestId" />
+  <div class="row-fluid">
+    <div>
+      <form class="form-inline">
+        <label for="start">Start: </label><input id="start" style="width: 220px"/>
+        <label for="end">End : </label><input id="end" style="width: 220px"/>
+        <label for="mvid">MVID: </label><input id="mvid" type="text" class="input-large" placeholder="MVID"/>
+        <button class="submitButton k-button" id="submit">Submit</button>
+      </form>
+      <div id="message" class="alert ">
+        Cookie Activities Timeline
+      </div>
 
-                <button class="submitButton k-button" id="submit">Submit</button>
-            </form>
+      <div id="timeline"></div>
 
-            <div id="timeline"></div>
+      <!-- Modal -->
+      <div class="modal fade" id="logdetailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+           aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h4 class="modal-title" id="myModalLabel">Log Detail</h4>
+              <div id="loglink"></div>
+            </div>
+            <div class="modal-body" id="logdetail"></div>
+
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 </div>
 
 
-
 <script>
-    $(document).ready(function () {
+  // DOM element where the Timeline will be attached
+  var container = document.getElementById('timeline');
 
-        function startChange() {
-            var startDate = start.value(),
-                    endDate = end.value();
-        }
+  // Configuration for the Timeline
+  var options = {};
+  var items = new vis.DataSet();
+  var groups = new vis.DataSet();
 
-        function endChange() {
-            var endDate = end.value(),
-                    startDate = start.value();
-        }
+  $(document).ready(function () {
 
-        var today = kendo.date.today();
+    function startChange() {
+      var startDate = start.value(),
+              endDate = end.value();
+    }
 
-        var now = new Date();
-        var day = now.getDate();
-        var month = now.getMonth();
-        var year = now.getFullYear();
-        var hour = now.getHours();
+    function endChange() {
+      var endDate = end.value(),
+              startDate = start.value();
+    }
 
-        var onehourago = new Date(year, month, day, hour-1);
+    var today = kendo.date.today();
 
-        var start = $("#start").kendoDateTimePicker({
-            value: onehourago,
-            change: startChange
-        }).data("kendoDateTimePicker");
+    var now = new Date();
+    var day = now.getDate();
+    var month = now.getMonth();
+    var year = now.getFullYear();
+    var hour = now.getHours();
+    var min = now.getMinutes();
 
-        var end = $("#end").kendoDateTimePicker({
-            value: now,
-            change: endChange
-        }).data("kendoDateTimePicker");
+    var fiveminsAgo = new Date(year, month, day, hour, min - 5);
 
-//        start.max(end.value());
-//        end.min(start.value());
+    var start = $("#start").kendoDateTimePicker({
+      value: fiveminsAgo,
+      change: startChange
+    }).data("kendoDateTimePicker");
 
-        $("#submit").click(submit);
+    var end = $("#end").kendoDateTimePicker({
+      value: now,
+      change: endChange
+    }).data("kendoDateTimePicker");
 
-        var starttime = onehourago.getTime();
-        var endtime = now.getTime();
+    $("#submit").click(submit);
 
+    var starttime = fiveminsAgo.getTime();
+    var endtime = now.getTime();
 
-        function submit(e) {
-            var starttime = start.value().getTime();
-            var endtime = end.value().getTime();
-            var user = $("#user").val();
-            var name = $("#name").val();
-            var queue = $("#queue").val();
-            var state = $("#state").val();
+    $.ajax(
+            {
+              type: 'GET',
+              url: '/rest/hbase/scan?table=dspsession-idx-mvid&start=' + starttime + '&end=' + endtime,
+              dataType: 'json',
+              success: function (result, textStatus) {
+                items = new vis.DataSet(result['items']);
+                groups = new vis.DataSet(result['groups']);
 
-            tasksDataSource.transport.options.read.url = serviceRoot + "?startedTimeBegin=" + starttime + "&startedTimeEnd=" + endtime + "&user=" + user + "&name=" + name + "&queue=" + queue + "&state=" + state;
-            tasksDataSource.read();
-        }
+              },
+              error: function (XMLHttpRequest, textStatus, errorThrown) {
+                $("#message").attr('class', 'alert alert-block alert-danger');
+                $("#message").html(errorThrown);
+              }
+            });
 
+    var timeline = new vis.Timeline(container, items, groups, options);
+    timeline.on('select', function (properties) {
+      var logdetail = document.getElementById('logdetail');
+      var selected = properties['items'][0];
+      var value = items.get(selected).content;
+      console.log("selected:" + selected + ", content:" + value);
+      var family = value.split(":")[0];
+      var showRequestId = value.split(":")[1];
+      var url = '/rest/hbase/get?table=dspsession' + '&showRequestId=' + showRequestId + '&family=' + family;
 
-        var serviceRoot = "/rest/mrv2job/jobhistory";
+      $.ajax(
+              {
+                type: 'GET',
+                url: url,
+                dataType: 'json',
+                success: function (result, textStatus) {
 
-        var tasksDataSource = new kendo.data.GanttDataSource({
-            transport: {
-                read: serviceRoot + "?startedTimeBegin=" + starttime + "&startedTimeEnd=" + endtime
-            },
-            schema: {
-                model: {
-                    id: "id",
-                    fields: {
-                        id: { from: "id", type: "string" },
-//                        orderId: { from: "orderID", type: "number", validation: { required: true } },
-//                        parentId: { from: "parentID", type: "string", defaultValue: null, validation: { required: true } },
-                        start: {
-                            from: "startTime",
-                            type: "date",
-                            parse: function (value) {
-                                return kendo.toString(new Date(value));
-                            }
-                        },
-                        end: {
-                            from: "finishTime",
-                            type: "date",
-                            parse: function (value) {
-                                return kendo.toString(new Date(value));
-                            }
-                        },
-                        title: { from: "name", defaultValue: "", type: "string" },
-                        percentComplete: { from: "progress", type: "number", defaultValue: 100 },
-                        summary: { from: "summary", type: "boolean" },
-                        expanded: { from: "expanded", type: "boolean", defaultValue: true }
-                    }
+                  var logdetail = document.getElementById('logdetail');
+                  logdetail.innerHTML = JSON.stringify(result);
+
+                  var loglink = document.getElementById('loglink');
+                  loglink.innerHTML = "<a href='" + url + "' target='_blank'>open in new Tab</a>"
+                  $('#logdetailModal').modal('show');
+
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                  $("#message").attr('class', 'alert alert-block alert-danger');
+                  $("#message").html(errorThrown);
                 }
-            },
-            sort: { field: "start", dir: "asc" }
-        });
+              });
 
-    });
+    })
+
+    function submit(e) {
+      var starttime = start.value().getTime();
+      var endtime = end.value().getTime();
+      var mvid = $("#mvid").val();
+
+      $("#message").attr('class', 'alert alert-block alert-info');
+      $("#message").html("Querying.... ");
+
+      $.ajax(
+              {
+                type: 'GET',
+                url: '/rest/hbase/scan?table=dspsession-idx-mvid&start=' + starttime + '&end=' + endtime + '&row=' + mvid,
+                dataType: 'json',
+                success: function (result, textStatus) {
+
+                  $("#message").attr('class', 'alert alert-block alert-info');
+                  $("#message").html("SUCCESS");
+
+                  items.clear();
+                  groups.clear();
+
+                  items.add(result['items']);
+                  groups.add(result['groups']);
+                  timeline.setItems(items);
+                  timeline.setGroups(groups);
+
+                },
+                error: function (XMLHttpRequest, textStatus, errorThrown) {
+                  $("#message").attr('class', 'alert alert-block alert-danger');
+                  $("#message").html(errorThrown);
+                }
+              });
+    }
+
+  });
 
 </script>
-
-<!--<script>-->
-    <!--var now = moment().minutes(0).seconds(0).milliseconds(0);-->
-    <!--var groupCount = 3;-->
-    <!--var itemCount = 20;-->
-
-    <!--// create a data set with groups-->
-    <!--var names = ['John', 'Alston', 'Lee', 'Grant'];-->
-    <!--var groups = new vis.DataSet();-->
-    <!--for (var g = 0; g < groupCount; g++) {-->
-        <!--groups.add({id: g, content: names[g]});-->
-    <!--}-->
-
-    <!--// create a dataset with items-->
-    <!--var items = new vis.DataSet();-->
-    <!--for (var i = 0; i < itemCount; i++) {-->
-        <!--var start = now.clone().add(Math.random() * 200, 'hours');-->
-        <!--var group = Math.floor(Math.random() * groupCount);-->
-        <!--items.add({-->
-            <!--id: i,-->
-            <!--group: group,-->
-            <!--content: 'item ' + i +-->
-            <!--' <span style="color:#97B0F8;">(' + names[group] + ')</span>',-->
-            <!--start: start,-->
-            <!--type: 'box'-->
-        <!--});-->
-    <!--}-->
-
-    <!--// create visualization-->
-    <!--var container = document.getElementById('timeline');-->
-    <!--var options = {-->
-        <!--groupOrder: 'content'  // groupOrder can be a property name or a sorting function-->
-    <!--};-->
-
-    <!--var timeline = new vis.Timeline(container);-->
-    <!--timeline.setOptions(options);-->
-    <!--timeline.setGroups(groups);-->
-    <!--timeline.setItems(items);-->
-
-<!--</script>-->
-
-<script>
-    // DOM element where the Timeline will be attached
-    var container = document.getElementById('timeline');
-
-    // Create a DataSet (allows two way data-binding)
-    var items = new vis.DataSet(    [
-        {
-            "id": 167168605450210300,
-            "group": "00029880654502103090016",
-            "content": "u",
-            "start": 1472910654016,
-            "type": "point"
-        },
-        {
-            "id": 8646426294849210000,
-            "group": "00026981433051614080016",
-            "content": "u",
-            "start": 1472910588865,
-            "type": "point"
-        },
-        {
-            "id": 3414798543949210000,
-            "group": "00024732905031125040015",
-            "content": "s",
-            "start": 1472910580484,
-            "type": "point"
-        },
-        {
-            "id": 3132918401451210000,
-            "group": "00011142234211823010016",
-            "content": "u",
-            "start": 1472910674313,
-            "type": "point"
-        },
-        {
-            "id": 9055058950751210000,
-            "group": "00008433509202219100015",
-            "content": "u",
-            "start": 1472910667906,
-            "type": "point"
-        },
-        {
-            "id": 8579158414650000,
-            "group": "00001390251571319010015",
-            "content": "u",
-            "start": 1472910646857,
-            "type": "point"
-        },
-        {
-            "id": 8579158414650210001,
-            "group": "00001390251571319010015",
-            "content": "s",
-            "start": 1472910700857,
-            "type": "point"
-        }
-    ]);
-
-    var groups = new vis.DataSet(
-            [
-                {"id": "00001390251571319010015", content:"mvid"},
-                {"id": "00008433509202219100015", content:"mvid"},
-                {"id": "00011142234211823010016", content:"mvid"},
-                {"id": "00024732905031125040015", content:"mvid"},
-            ]
-    );
-
-    // Configuration for the Timeline
-    var options = {};
-
-    // Create a Timeline
-    var timeline = new vis.Timeline(container);
-    timeline.setItems(items)
-    timeline.setGroups(groups)
-    timeline.setOptions(options)
-</script>
-
-</div>

@@ -64,5 +64,5 @@ GET         /rest/sparksql/result/*file                      controllers.Externa
 POST        /rest/hive/runsqljdbc                            controllers.HiveJDBCController.runSQLQuery()
 
 # HBase
-GET         /rest/hbase/get                                  controllers.HBaseThriftClientController.get(table, showRequestId:Long, family,qualifier)
-GET         /rest/hbase/scan                                 controllers.HBaseThriftClientController.scan(table, start:Long, end:Long, mvid ?= null)
+GET         /rest/hbase/get                                  controllers.HBaseThriftClientController.get(table, showRequestId:Long, family ?= null, qualifier ?= null)
+GET         /rest/hbase/scan                                 controllers.HBaseThriftClientController.scan(table, start:Long, end:Long, row ?= null)
