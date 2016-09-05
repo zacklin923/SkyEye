@@ -48,7 +48,7 @@ object HBaseThriftClientController extends Controller {
         scan.setStopRow(Bytes.toBytes(row))
       }
 
-      val result = client.getScannerResults(ByteBuffer.wrap(Bytes.toBytes(table)), scan, 100)
+      val result = client.getScannerResults(ByteBuffer.wrap(Bytes.toBytes(table)), scan, 1000)
 
       for (r: TResult <- result) {
 
@@ -72,7 +72,7 @@ object HBaseThriftClientController extends Controller {
       transport.close()
     }
 
-    val ret = Json.obj("items" -> Json.toJson(items.toSet), "groups" -> Json.toJson(groups.toSet))
+    val ret = Json.obj("items" -> Json.toJson(items.toSet), "groups" -> Json.toJson(groups.toSet), "summary" -> Json.obj("itemcount" -> items.size(), "groupcount" -> groups.size()))
     Ok(ret)
   }
 

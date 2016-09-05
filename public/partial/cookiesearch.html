@@ -88,6 +88,8 @@
               success: function (result, textStatus) {
                 items = new vis.DataSet(result['items']);
                 groups = new vis.DataSet(result['groups']);
+                $("#message").attr('class', 'alert alert-block alert-info');
+                $("#message").html("SUCCESS, mvid count: " + result['summary']['groupcount'] + ", sessions :" + result['summary']['itemcount']);
 
               },
               error: function (XMLHttpRequest, textStatus, errorThrown) {
@@ -145,7 +147,7 @@
                 success: function (result, textStatus) {
 
                   $("#message").attr('class', 'alert alert-block alert-info');
-                  $("#message").html("SUCCESS");
+                  $("#message").html("SUCCESS, mvid count: " + result['summary']['groupcount'] + ", sessions :" + result['summary']['itemcount']);
 
                   items.clear();
                   groups.clear();
